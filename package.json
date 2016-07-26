@@ -22,7 +22,11 @@
   },
   "homepage": "https://github.com/sugyan/tif2016-mytt#readme",
   "dependencies": {
-    "webpack": "^1.13.1"
+    "babel-core": "^6.11.4",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "webpack": "^1.13.1",
+    "whatwg-fetch": "^1.0.0"
   },
   "devDependencies": {
     "webpack-dev-server": "^1.14.1"
