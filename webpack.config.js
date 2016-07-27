@@ -1,7 +1,9 @@
 /* eslint-env node */
 
-module.exports = {
-    entry: './app/assets/src/js/main.js',
+const webpack = require('webpack');
+
+const config = {
+    entry: './app/assets/src/js/main.jsx',
     output: {
         path: './public/javascripts',
         publicPath: '/javascripts/',
@@ -10,11 +12,11 @@ module.exports = {
     module: {
         loaders: [
             {
-                test: /\.js$/,
+                test: /\.jsx$/,
                 exclude: /node_modules/,
                 loader: 'babel',
                 query: {
-                    presets: ['es2015']
+                    presets: ['es2015', 'react']
                 }
             }
         ]
@@ -23,3 +25,18 @@ module.exports = {
         inline: true
     }
 };
+
+if (process.env.NODE_ENV === 'production') {
+    config.plugins = [
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+        }),
+        new webpack.optimize.UglifyJsPlugin({
+            compless: {
+                warnings: false
+            }
+        })
+    ];
+}
+
+module.exports = config;
