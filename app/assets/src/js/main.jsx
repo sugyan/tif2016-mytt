@@ -6,6 +6,7 @@ import 'whatwg-fetch';
 export default class App extends React.Component {
     constructor(props) {
         super(props);
+        moment.locale('ja');
         this.days = {
             day1: '08-05',
             day2: '08-06',
@@ -31,13 +32,18 @@ export default class App extends React.Component {
             const start = moment(`2016-${this.days[e.day]} ${e.start}+09:00`, 'YYYY-MM-DD HHmmZ');
             const end   = moment(`2016-${this.days[e.day]} ${e.end  }+09:00`, 'YYYY-MM-DD HHmmZ');
             return (
-                <div key={i}>
-                  {`${start.format('M/D (ddd)')}: ${start.format('HH:mm')} - ${end.format('HH:mm')} [${e.stage}] ${e.artist}`}
-                </div>
+                <li key={i}>
+                  {`${start.format('M/D(ddd)')} ${start.format('HH:mm')} - ${end.format('HH:mm')} [${e.stage}] ${e.artist}`}
+                </li>
             );
         });
         return (
-            <div>{stages}</div>
+            <div>
+              <p>全{this.state.stages.length}件</p>
+              <ul>
+                {stages}
+              </ul>
+            </div>
         );
     }
 }
