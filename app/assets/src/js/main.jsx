@@ -49,18 +49,25 @@ export default class App extends React.Component {
             const start = moment(`2016-${date} ${e.start}+09:00`, 'YYYY-MM-DD HHmmZ');
             const end   = moment(`2016-${date} ${e.end  }+09:00`, 'YYYY-MM-DD HHmmZ');
             return (
-                <li key={i}>
-                  {`${start.format('M/D(ddd)')} ${start.format('HH:mm')} - ${end.format('HH:mm')} [${e.stage}] ${e.artist}`}
-                </li>
+                <tr key={i}>
+                  <td>
+                    {`${start.format('M/D(ddd)')}`}
+                    {`${start.format('HH:mm')} - ${end.format('HH:mm')}`}
+                    {`[${e.stage}] ${e.artist}`}
+                  </td>
+                </tr>
             );
         });
         return (
-            <div>
+            <div className="container-fluid">
               <FilteringForm onUpdateQuery={this.handleUpdateQuery.bind(this)} />
+              <hr />
               <p>全{stages.length}件</p>
-              <ul>
-                {stages}
-              </ul>
+              <table className="table table-striped">
+                <tbody>
+                  {stages}
+                </tbody>
+              </table>
             </div>
         );
     }
@@ -93,7 +100,7 @@ class FilteringForm extends React.Component {
         const checks = Object.keys(this.state.days).sort().map((key, i) => {
             const date = moment(`2016-${key}`, 'YYYY-MM-DD');
             return (
-                <label key={i}>
+                <label key={i} className="checkbox-inline">
                   <input
                       type="checkbox"
                       checked={this.state.days[key]}
