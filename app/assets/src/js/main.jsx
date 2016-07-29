@@ -20,6 +20,16 @@ export default class App extends React.Component {
                     '08-05': true,
                     '08-06': true,
                     '08-07': true
+                },
+                stages: {
+                    'HOT STAGE':      true,
+                    'SHIP STAGE':     true,
+                    'DOLL FACTORY':   true,
+                    'SKY STAGE':      true,
+                    'SMILE GARDEN':   true,
+                    'FESTIVAL STAGE': true,
+                    'DREAM STAGE':    true,
+                    'INFO CENTRE':    true
                 }
             }
         };
@@ -43,7 +53,7 @@ export default class App extends React.Component {
     render() {
         const stages = this.state.stages.filter((e) => {
             const date = this.days[e.day];
-            return this.state.query.days[date];
+            return this.state.query.days[date] && this.state.query.stages[e.stage];
         }).map((e, i) => {
             const date = this.days[e.day];
             const start = moment(`2016-${date} ${e.start}+09:00`, 'YYYY-MM-DD HHmmZ');
@@ -51,9 +61,7 @@ export default class App extends React.Component {
             return (
                 <tr key={i}>
                   <td>
-                    {`${start.format('M/D(ddd)')}`}
-                    {`${start.format('HH:mm')} - ${end.format('HH:mm')}`}
-                    {`[${e.stage}] ${e.artist}`}
+                    {`${start.format('M/D(ddd)')}`} {`${start.format('HH:mm')} - ${end.format('HH:mm')}`} {`[${e.stage}] ${e.artist}`}
                   </td>
                 </tr>
             );
@@ -63,7 +71,7 @@ export default class App extends React.Component {
               <FilteringForm onUpdateQuery={this.handleUpdateQuery.bind(this)} />
               <hr />
               <p>全{stages.length}件</p>
-              <table className="table table-striped">
+              <table className="table">
                 <tbody>
                   {stages}
                 </tbody>
@@ -77,42 +85,80 @@ class FilteringForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            days: {
-                '08-05': true,
-                '08-06': true,
-                '08-07': true
-            }
+            days: [
+                [ '08-05', true ],
+                [ '08-06', true ],
+                [ '08-07', true ]
+            ],
+            stages: [
+                [ 'HOT STAGE',      true ],
+                [ 'SHIP STAGE',     true ],
+                [ 'DOLL FACTORY',   true ],
+                [ 'SKY STAGE',      true ],
+                [ 'SMILE GARDEN',   true ],
+                [ 'FESTIVAL STAGE', true ],
+                [ 'DREAM STAGE',    true ],
+                [ 'INFO CENTRE',    true ]
+            ]
         };
     }
-    handleCheck(key) {
-        const days = this.state.days;
-        days[key] = !days[key];
+    handleCheck(key, i) {
+        const items = this.state[key];
+        items[i][1] = !items[i][1];
         this.setState({
-            days: days
+            [key]: items
+        }, () => {
+            if (this.props.onUpdateQuery) {
+                const query = {
+                    days: {},
+                    stages: {}
+                };
+                ['days', 'stages'].forEach((key) => {
+                    this.state[key].forEach((e) => query[key][e[0]] = e[1]);
+                });
+                this.props.onUpdateQuery(query);
+            }
         });
-        if (this.props.onUpdateQuery) {
-            this.props.onUpdateQuery({
-                days: days
-            });
-        }
     }
     render() {
-        const checks = Object.keys(this.state.days).sort().map((key, i) => {
-            const date = moment(`2016-${key}`, 'YYYY-MM-DD');
+        const checks = this.state.days.map((e, i) => {
+            const date = moment(`2016-${e[0]}`, 'YYYY-MM-DD');
             return (
                 <label key={i} className="checkbox-inline">
                   <input
                       type="checkbox"
-                      checked={this.state.days[key]}
-                      onChange={this.handleCheck.bind(this, key)} />
+                      checked={e[1]}
+                      onChange={this.handleCheck.bind(this, 'days', i)} />
                   {date.format('M/D(ddd)')}
                 </label>
             );
         });
+        const stages = this.state.stages.map((e, i) => {
+            return (
+                <label key={i} className="checkbox-inline" style={{ marginLeft: '0px', marginRight: '10px' }}>
+                  <input
+                      type="checkbox"
+                      checked={e[1]}
+                      onChange={this.handleCheck.bind(this, 'stages', i)} />
+                  {e[0]}
+                </label>
+            );
+        });
         return (
-            <div>
-              {checks}
-            </div>
+            <form className="form-horizontal">
+              <div className="form-group">
+                <label className="col-sm-2 control-label">日付</label>
+                <div className="col-sm-10">
+                  {checks}
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="col-sm-2 control-label">ステージ</label>
+                <div className="col-sm-10">
+                  {stages}
+                </div>
+              </div>
+            </form>
         );
     }
 }
