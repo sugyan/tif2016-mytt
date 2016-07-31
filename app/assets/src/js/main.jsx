@@ -22,7 +22,12 @@ export default class App extends React.Component {
         fetch('/api/timetable.json').then((response) => {
             return response.json();
         }).then((json) => {
-            this.data = json;
+            this.data = json.map((e) => {
+                const date = this.days[e.day];
+                e.start = moment(`2016-${date} ${e.start}+09:00`, 'YYYY-MM-DD HHmmZ');
+                e.end   = moment(`2016-${date} ${e.end  }+09:00`, 'YYYY-MM-DD HHmmZ');
+                return e;
+            }).sort((a, b) => a.start.diff(b.start) || a.end.diff(b.end));
             this.setState({
                 stages: this.data
             });
@@ -45,13 +50,10 @@ export default class App extends React.Component {
     }
     render() {
         const stages = this.state.stages.map((e, i) => {
-            const date = this.days[e.day];
-            const start = moment(`2016-${date} ${e.start}+09:00`, 'YYYY-MM-DD HHmmZ');
-            const end   = moment(`2016-${date} ${e.end  }+09:00`, 'YYYY-MM-DD HHmmZ');
             return (
                 <tr key={i}>
                   <td>
-                    {`${start.format('M/D(ddd)')}`} {`${start.format('HH:mm')} - ${end.format('HH:mm')}`} {`[${e.stage}] ${e.artist}`}
+                    {`${e.start.format('M/D(ddd)')}`} {`${e.start.format('HH:mm')} - ${e.end.format('HH:mm')}`} {`[${e.stage}] ${e.artist}`}
                   </td>
                 </tr>
             );
@@ -163,7 +165,7 @@ class FilteringForm extends React.Component {
                 </div>
               </div>
               <div className="form-group">
-                <label className="col-sm-2 control-label">キーワード</label>
+                <label className="col-sm-2 control-label">出演者名</label>
                 <div className="col-sm-10">
                   <input
                       className="form-control"
