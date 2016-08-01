@@ -71,6 +71,28 @@ export default class App extends React.Component {
             checked: checked
         });
     }
+    handleSubmit() {
+        const results = {
+            day1: [],
+            day2: [],
+            day3: []
+        };
+        this.data.forEach((e) => {
+            if (! this.state.checked[e.id]) {
+                return;
+            }
+            results[e.day].push(e);
+        });
+        const text = Object.keys(results).sort().map((key) => {
+            const items = results[key];
+            if (! items.length) {
+                return '';
+            }
+            const texts = items.map((e) => `${e.start.format('HH:mm')}-${e.end.format('HH:mm')} [${e.stage}] ${e.artist}`);
+            return this.days[key] + '\n' + texts.join('\n');
+        }).join('\n\n').trim();
+        alert(text);
+    }
     render() {
         const stages = this.state.stages.map((e, i) => {
             const color = this.colors[e.stage] || '#ffffff';
@@ -97,6 +119,19 @@ export default class App extends React.Component {
                 </tr>
             );
         });
+        const nav = (
+            <nav className="navbar navbar-default navbar-fixed-bottom">
+              <div className="container-fluid">
+                <div className="navbar-collapse navbar-right">
+                  <button className="btn btn-primary navbar-btn" onClick={this.handleSubmit.bind(this)}>
+                    選択中の
+                    <strong>{Object.keys(this.state.checked).length}</strong>
+                    件でタイムテーブルを生成
+                  </button>
+                </div>
+              </div>
+            </nav>
+        );
         return (
             <div className="container-fluid">
               <FilteringForm onUpdateQuery={this.handleUpdateQuery.bind(this)} />
@@ -107,6 +142,7 @@ export default class App extends React.Component {
                   {stages}
                 </tbody>
               </table>
+              {Object.keys(this.state.checked).length ? nav : null}
             </div>
         );
     }
