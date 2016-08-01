@@ -14,16 +14,28 @@ export default class App extends React.Component {
             day2: '08-06',
             day3: '08-07'
         };
+        this.colors = {
+            'HOT STAGE':      '#fb1a39',
+            'SHIP STAGE':     '#363483',
+            'SMILE GARDEN':   '#ff9000',
+            'DOLL FACTORY':   '#ff6aa2',
+            'SKY STAGE':      '#07c1fe',
+            'FESTIVAL STAGE': '#9fc700',
+            'DREAM STAGE':    '#009c45',
+            'INFO CENTRE':    '#e4007f'
+        };
         this.state = {
-            stages: []
+            stages: [],
+            checked: {}
         };
     }
     componentDidMount() {
         fetch('/api/timetable.json').then((response) => {
             return response.json();
         }).then((json) => {
-            this.data = json.map((e) => {
+            this.data = json.map((e, i) => {
                 const date = this.days[e.day];
+                e.id = `#${i}`;
                 e.start = moment(`2016-${date} ${e.start}+09:00`, 'YYYY-MM-DD HHmmZ');
                 e.end   = moment(`2016-${date} ${e.end  }+09:00`, 'YYYY-MM-DD HHmmZ');
                 return e;
@@ -48,12 +60,37 @@ export default class App extends React.Component {
             stages: stages
         });
     }
+    handleCheck(id, e) {
+        const checked = this.state.checked;
+        if (e.target.checked) {
+            checked[id] = true;
+        } else {
+            delete checked[id];
+        }
+        this.setState({
+            checked: checked
+        });
+    }
     render() {
         const stages = this.state.stages.map((e, i) => {
+            const color = this.colors[e.stage] || '#ffffff';
             return (
                 <tr key={i}>
-                  <td>
-                    {`${e.start.format('M/D(ddd)')}`} {`${e.start.format('HH:mm')} - ${e.end.format('HH:mm')}`} {`[${e.stage}] ${e.artist}`}
+                  <td style={{ whiteSpace: 'nowrap' }}>
+                    <div className="checkbox" style={{ marginTop: 0, marginBottom: 0 }}>
+                      <label>
+                        <input
+                            type="checkbox"
+                            checked={this.state.checked[e.id] ? true : false}
+                            onChange={this.handleCheck.bind(this, e.id)} />
+                        {`${e.start.format('M/D(ddd)')}`} {`${e.start.format('HH:mm')} - ${e.end.format('HH:mm')}`}
+                      </label>
+                    </div>
+                  </td>
+                  <td style={{ backgroundColor: color, padding: '4px', width: '100%' }}>
+                    <div style={{ backgroundColor: '#ffffff', padding: '4px', borderRadius: '4px' }}>
+                      {`[${e.stage}] ${e.artist}`}
+                    </div>
                   </td>
                 </tr>
             );
