@@ -89,7 +89,9 @@ export default class App extends React.Component {
                   </td>
                   <td style={{ backgroundColor: color, padding: '4px', width: '100%' }}>
                     <div style={{ backgroundColor: '#ffffff', padding: '4px', borderRadius: '4px' }}>
-                      {`[${e.stage}] ${e.artist}`}
+                      <small>{e.stage}</small>
+                      <br />
+                      <strong>{e.artist}</strong>
                     </div>
                   </td>
                 </tr>
