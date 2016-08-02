@@ -83,15 +83,25 @@ export default class App extends React.Component {
             }
             results[e.day].push(e);
         });
-        const text = Object.keys(results).sort().map((key) => {
-            const items = results[key];
-            if (! items.length) {
-                return '';
+        const token = (() => {
+            for (const elem of document.getElementsByTagName('meta')) {
+                if (elem.name === 'csrf-token') {
+                    return elem.content;
+                }
             }
-            const texts = items.map((e) => `${e.start.format('HH:mm')}-${e.end.format('HH:mm')} [${e.stage}] ${e.artist}`);
-            return this.days[key] + '\n' + texts.join('\n');
-        }).join('\n\n').trim();
-        alert(text);
+        })();
+        fetch('/api/generate', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(results)
+        }).then((response) => {
+            return response.json();
+        }).then((json) => {
+            window.location.href = json.result;
+        });
     }
     render() {
         const stages = this.state.stages.map((e, i) => {

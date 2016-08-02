@@ -37,3 +37,4 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 # Others
 gem 'dalli'
 gem 'slim'
+gem 'rmagick'
