@@ -103,17 +103,9 @@ export default class App extends React.Component {
             }
             results[e.day].push(e);
         });
-        const token = (() => {
-            for (const elem of document.getElementsByTagName('meta')) {
-                if (elem.name === 'csrf-token') {
-                    return elem.content;
-                }
-            }
-        })();
         fetch('/api/generate', {
             method: 'POST',
             headers: {
-                'X-CSRF-Token': token,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(results)
@@ -188,9 +180,17 @@ export default class App extends React.Component {
             </div>
         );
         return (
-            <div className="container-fluid">
-              <h3>TIF 2016</h3>
-              {this.state.result ? result : main}
+            <div>
+              <nav className="navbar navbar-inverse navbar-fixed-top">
+                <div className="container-fluid">
+                  <div className="navbar-header">
+                    <span className="navbar-brand">TIF 2016</span>
+                  </div>
+                </div>
+              </nav>
+              <div className="container-fluid">
+                {this.state.result ? result : main}
+              </div>
             </div>
         );
     }
