@@ -1,24 +1,9 @@
 # coding: utf-8
-require 'open-uri'
 
 class ApiController < ApplicationController
   def timetable
-    @data = Rails.cache.fetch('timetable', expires_in: 1.hour) do
-      results = []
-      open('http://www.idolfes.com/2016/json/timetable/time.json') do |f|
-        JSON.parse(f.read).each do |day, stages|
-          stages.each do |stage, items|
-            items.each do |item|
-              results << item.merge(
-                'day' => day,
-                'stage' => stage
-              )
-            end
-          end
-        end
-      end
-      results
-    end
+    @data = Rails.cache.read('main') || []
+    @data.concat(Rails.cache.read('greeting') || [])
   end
 
   def generate
@@ -39,7 +24,7 @@ class ApiController < ApplicationController
     }
     images = %w(day1 day2 day3).map do |day|
       next unless params[day]
-      title = Magick::Image.new(600, 35)
+      title = Magick::Image.new(550, 35)
       Magick::Draw.new.annotate(title, 0, 0, 0, 0, days[day]) do
         self.font = Rails.root.join('.fonts', 'ipagp.ttf').to_path
         self.pointsize = 15
@@ -51,17 +36,17 @@ class ApiController < ApplicationController
           item['start'].in_time_zone.strftime('%H:%M'),
           item['end'].in_time_zone.strftime('%H:%M')
         )
-        img = Magick::Image.new(600, 35) do
-          self.background_color = colors[item['stage']]
+        img = Magick::Image.new(550, 35) do
+          self.background_color = colors[item['stage']] || '#808080'
         end
-        Magick::Draw.new.fill('white').roundrectangle(5, 5, 595, 30, 5, 5).draw(img)
+        Magick::Draw.new.fill('white').roundrectangle(5, 5, 545, 30, 5, 5).draw(img)
         Magick::Draw.new.annotate(img, 0, 0, 10, 24, time) do
           self.pointsize = 15
         end
         Magick::Draw.new.annotate(img, 0, 0, 100, 24, format('[%s]', item['stage'])) do
           self.pointsize = 15
         end
-        Magick::Draw.new.annotate(img, 0, 0, 240, 24, item['artist']) do
+        Magick::Draw.new.annotate(img, 0, 0, 270, 24, item['artist']) do
           self.font = Rails.root.join('.fonts', 'ipagp.ttf').to_path
           self.font_weight = Magick::BoldWeight
           self.pointsize = 15
