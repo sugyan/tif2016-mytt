@@ -14,6 +14,24 @@ export default class App extends React.Component {
             day2: '08-06',
             day3: '08-07'
         };
+        this.query = {
+            days: {
+                '08-05': true,
+                '08-06': true,
+                '08-07': true
+            },
+            stages: {
+                'HOT STAGE':      true,
+                'SHIP STAGE':     true,
+                'SMILE GARDEN':   true,
+                'DOLL FACTORY':   true,
+                'SKY STAGE':      true,
+                'FESTIVAL STAGE': true,
+                'DREAM STAGE':    true,
+                'INFO CENTRE':    true
+            },
+            keyword: ''
+        };
         this.colors = {
             'HOT STAGE':      '#fb1a39',
             'SHIP STAGE':     '#363483',
@@ -26,7 +44,8 @@ export default class App extends React.Component {
         };
         this.state = {
             stages: [],
-            checked: {}
+            checked: {},
+            result: null
         };
     }
     componentDidMount() {
@@ -48,6 +67,7 @@ export default class App extends React.Component {
         });
     }
     handleUpdateQuery(query) {
+        this.query = query;
         const stages = this.data.filter((e) => {
             if (query.keyword.length > 0) {
                 if (!e.artist.match(new RegExp(query.keyword, 'i'))) {
@@ -100,8 +120,11 @@ export default class App extends React.Component {
         }).then((response) => {
             return response.json();
         }).then((json) => {
-            window.location.href = json.result;
+            this.setState({ result: json.result });
         });
+    }
+    handleBackButton() {
+        this.setState({ result: null });
     }
     render() {
         const stages = this.state.stages.map((e, i) => {
@@ -142,9 +165,9 @@ export default class App extends React.Component {
               </div>
             </nav>
         );
-        return (
-            <div className="container-fluid">
-              <FilteringForm onUpdateQuery={this.handleUpdateQuery.bind(this)} />
+        const main = (
+            <div>
+              <FilteringForm query={this.query} onUpdateQuery={this.handleUpdateQuery.bind(this)} />
               <hr />
               <p>全{stages.length}件</p>
               <table className="table">
@@ -155,6 +178,20 @@ export default class App extends React.Component {
               {Object.keys(this.state.checked).length ? nav : null}
             </div>
         );
+        const result = (
+            <div>
+              <div>
+                <img src={this.state.result} />
+              </div>
+              <hr />
+              <button className="btn btn-default" onClick={this.handleBackButton.bind(this)}>戻る</button>
+            </div>
+        );
+        return (
+            <div className="container-fluid">
+              {this.state.result ? result : main}
+            </div>
+        );
     }
 }
 
@@ -163,21 +200,21 @@ class FilteringForm extends React.Component {
         super(props);
         this.state = {
             days: [
-                [ '08-05', true ],
-                [ '08-06', true ],
-                [ '08-07', true ]
+                [ '08-05', props.query.days['08-05'] ],
+                [ '08-06', props.query.days['08-06'] ],
+                [ '08-07', props.query.days['08-07'] ]
             ],
             stages: [
-                [ 'HOT STAGE',      true ],
-                [ 'SHIP STAGE',     true ],
-                [ 'DOLL FACTORY',   true ],
-                [ 'SKY STAGE',      true ],
-                [ 'SMILE GARDEN',   true ],
-                [ 'FESTIVAL STAGE', true ],
-                [ 'DREAM STAGE',    true ],
-                [ 'INFO CENTRE',    true ]
+                [ 'HOT STAGE',      props.query.stages['HOT STAGE']      ],
+                [ 'SHIP STAGE',     props.query.stages['SHIP STAGE']     ],
+                [ 'DOLL FACTORY',   props.query.stages['DOLL FACTORY']   ],
+                [ 'SKY STAGE',      props.query.stages['SKY STAGE']      ],
+                [ 'SMILE GARDEN',   props.query.stages['SMILE GARDEN']   ],
+                [ 'FESTIVAL STAGE', props.query.stages['FESTIVAL STAGE'] ],
+                [ 'DREAM STAGE',    props.query.stages['DREAM STAGE']    ],
+                [ 'INFO CENTRE',    props.query.stages['INFO CENTRE']    ]
             ],
-            keyword: ''
+            keyword: props.query.keyword
         };
     }
     handleCheck(key, i) {
