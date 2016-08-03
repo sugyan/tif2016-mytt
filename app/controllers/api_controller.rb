@@ -40,9 +40,10 @@ class ApiController < ApplicationController
     images = %w(day1 day2 day3).map do |day|
       next unless params[day]
       title = Magick::Image.new(600, 35)
-      Magick::Draw.new.annotate(title, 0, 0, 10, 24, days[day]) do
+      Magick::Draw.new.annotate(title, 0, 0, 0, 0, days[day]) do
         self.font = Rails.root.join('.fonts', 'ipagp.ttf').to_path
         self.pointsize = 15
+        self.gravity = Magick::CenterGravity
       end
       images = params[day].map do |item|
         time = format(
