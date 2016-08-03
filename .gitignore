@@ -61,3 +61,4 @@ jspm_packages
 
 # Others
 /vendor/bundle
+/app/assets/javascripts/main.js

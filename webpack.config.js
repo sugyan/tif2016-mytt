@@ -5,9 +5,9 @@ const webpack = require('webpack');
 const config = {
     entry: './app/assets/src/js/main.jsx',
     output: {
-        path: './public/javascripts',
+        path: './app/assets/javascripts',
         publicPath: '/javascripts/',
-        filename: 'application.js'
+        filename: 'main.js'
     },
     module: {
         loaders: [
