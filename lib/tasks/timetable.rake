@@ -31,10 +31,25 @@ namespace :timetable do
           'stage'  => format('GREETING AREA (%s)', ('A'.ord + i).chr),
           'start'  => start_time.delete(':'),
           'end'    => end_time.delete(':'),
-          'artist' => item
+          'artist' => item.delete('<br>')
         }
       end
     end
     Rails.cache.write('greeting', results, expires_in: 3.hours)
+  end
+
+  task ennichi: :environment do
+    results = []
+    open('http://www.idolfes.com/2016/json/ennichi/ennichi.tsv').set_encoding('UTF-8').each_line do |line|
+      day, start_time, end_time, lane, artist = line.strip.split(/\t/, 5)
+      results << {
+        'day'    => day,
+        'stage'  => '縁日レーン' + lane,
+        'start'  => start_time,
+        'end'    => end_time,
+        'artist' => artist.delete('<br>')
+      }
+    end
+    Rails.cache.write('ennichi', results, expires_in: 3.hours)
   end
 end

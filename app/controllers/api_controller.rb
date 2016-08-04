@@ -4,6 +4,7 @@ class ApiController < ApplicationController
   def timetable
     @data = Rails.cache.read('main') || []
     @data.concat(Rails.cache.read('greeting') || [])
+    @data.concat(Rails.cache.read('ennichi') || [])
   end
 
   def generate
@@ -20,7 +21,8 @@ class ApiController < ApplicationController
       'SKY STAGE'      => '#07c1fe',
       'FESTIVAL STAGE' => '#9fc700',
       'DREAM STAGE'    => '#009c45',
-      'INFO CENTRE'    => '#e4007f'
+      'INFO CENTRE'    => '#e4007f',
+      'GREETING AREA'  => '#A0A0A0'
     }
     images = %w(day1 day2 day3).map do |day|
       next unless params[day]
@@ -37,13 +39,14 @@ class ApiController < ApplicationController
           item['end'].in_time_zone.strftime('%H:%M')
         )
         img = Magick::Image.new(550, 35) do
-          self.background_color = colors[item['stage']] || '#808080'
+          self.background_color = colors[item['stage'].gsub(/ \(.\)/, '')] || '#505050'
         end
         Magick::Draw.new.fill('white').roundrectangle(5, 5, 545, 30, 5, 5).draw(img)
         Magick::Draw.new.annotate(img, 0, 0, 10, 24, time) do
           self.pointsize = 15
         end
         Magick::Draw.new.annotate(img, 0, 0, 100, 24, format('[%s]', item['stage'])) do
+          self.font = Rails.root.join('.fonts', 'ipagp.ttf').to_path
           self.pointsize = 15
         end
         Magick::Draw.new.annotate(img, 0, 0, 270, 24, item['artist']) do

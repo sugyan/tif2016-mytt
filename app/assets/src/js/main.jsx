@@ -29,7 +29,8 @@ export default class App extends React.Component {
                 'FESTIVAL STAGE': true,
                 'DREAM STAGE':    true,
                 'INFO CENTRE':    true,
-                'GREETING AREA': false
+                'GREETING AREA': false,
+                'GRAND MARKET':  false
             },
             keyword: ''
         };
@@ -42,13 +43,17 @@ export default class App extends React.Component {
             'FESTIVAL STAGE': '#9fc700',
             'DREAM STAGE':    '#009c45',
             'INFO CENTRE':    '#e4007f',
-            'GREETING AREA':  '#808080'
+            'GREETING AREA':  '#A0A0A0',
+            'GRAND MARKET':   '#505050'
         };
         this.state = {
             stages: [],
             checked: {},
             result: null
         };
+    }
+    normalizeStageName(stage) {
+        return stage.replace(/ \(.\)/, '').replace(/縁日レーン\d/, 'GRAND MARKET');
     }
     componentDidMount() {
         fetch('/api/timetable.json').then((response) => {
@@ -63,8 +68,7 @@ export default class App extends React.Component {
             }).sort((a, b) => a.start.diff(b.start) || a.end.diff(b.end));
             this.setState({
                 stages: this.data.filter((e) => {
-                    const stage = e.stage.replace(/ \(.\)/, '');
-                    return this.query.stages[stage];
+                    return this.query.stages[this.normalizeStageName(e.stage)];
                 })
             });
         }).catch((err) => {
@@ -74,13 +78,12 @@ export default class App extends React.Component {
     handleUpdateQuery(query) {
         this.query = query;
         const stages = this.data.filter((e) => {
-            const stage = e.stage.replace(/ \(.\)/, '');
             if (query.keyword.length > 0) {
                 if (!e.artist.match(new RegExp(query.keyword, 'i'))) {
                     return false;
                 }
             }
-            return query.days[this.days[e.day]] && query.stages[stage];
+            return query.days[this.days[e.day]] && query.stages[this.normalizeStageName(e.stage)];
         });
         this.setState({
             stages: stages
@@ -126,7 +129,7 @@ export default class App extends React.Component {
     }
     render() {
         const stages = this.state.stages.map((e, i) => {
-            const color = this.colors[e.stage.replace(/ \(.\)/, '')] || '#ffffff';
+            const color = this.colors[this.normalizeStageName(e.stage)];
             return (
                 <tr key={i}>
                   <td style={{ whiteSpace: 'nowrap' }}>
@@ -220,7 +223,8 @@ class FilteringForm extends React.Component {
                 [ 'FESTIVAL STAGE', props.query.stages['FESTIVAL STAGE'] ],
                 [ 'DREAM STAGE',    props.query.stages['DREAM STAGE']    ],
                 [ 'INFO CENTRE',    props.query.stages['INFO CENTRE']    ],
-                [ 'GREETING AREA',  props.query.stages['GREETING AREA']  ]
+                [ 'GREETING AREA',  props.query.stages['GREETING AREA']  ],
+                [ 'GRAND MARKET',   props.query.stages['GRAND MARKET']   ]
             ],
             keyword: props.query.keyword
         };
