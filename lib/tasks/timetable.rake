@@ -31,7 +31,7 @@ namespace :timetable do
           'stage'  => format('GREETING AREA (%s)', ('A'.ord + i).chr),
           'start'  => start_time.delete(':'),
           'end'    => end_time.delete(':'),
-          'artist' => item.delete('<br>')
+          'artist' => item.gsub(/<br>/, ' ')
         }
       end
     end
@@ -47,7 +47,7 @@ namespace :timetable do
         'stage'  => '縁日レーン' + lane,
         'start'  => start_time,
         'end'    => end_time,
-        'artist' => artist.delete('<br>')
+        'artist' => artist.gsub('<br>', ' ')
       }
     end
     Rails.cache.write('ennichi', results, expires_in: 3.hours)
