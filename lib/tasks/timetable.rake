@@ -16,7 +16,7 @@ namespace :timetable do
         end
       end
     end
-    Rails.cache.write('main', results, expires_in: 3.hours)
+    Rails.cache.write('main', results)
   end
 
   task greeting: :environment do
@@ -35,7 +35,7 @@ namespace :timetable do
         }
       end
     end
-    Rails.cache.write('greeting', results, expires_in: 3.hours)
+    Rails.cache.write('greeting', results)
   end
 
   task ennichi: :environment do
@@ -50,6 +50,6 @@ namespace :timetable do
         'artist' => artist.gsub('<br>', ' ')
       }
     end
-    Rails.cache.write('ennichi', results, expires_in: 3.hours)
+    Rails.cache.write('ennichi', results)
   end
 end
